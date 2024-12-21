@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>+82 10 **** ****</title>
+    <link rel="stylesheet" href="https://use.typekit.net/ngl2bej.css">
+    <style>
+        *{
+            text-decoration: none;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column; /* Align everything vertically */
+        }
+        .time {
+            font-size: 24px;
+            font-family: "change", sans-serif;
+            font-weight: 500;
+            color: black;
+            position: absolute;
+            top: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        .axes {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .line {
+            position: absolute;
+            background-color: black;
+        }
+        /* X-Axis */
+        .x-axis {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            left: 0;
+        }
+        /* Y-Axis */
+        .y-axis {
+            width: 1px;
+            height: 100%;
+            top: 0;
+            left: 50%;
+        }
+        /* Circle */
+        .circle-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .circle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #000;
+            border-radius: 50%;
+        }
+        .circle-text {
+            margin-top: -30px;
+            margin-left: 40px;
+            font-size: 14px;
+            color: black;
+            font-family: "change", sans-serif;
+            font-weight: 500;
+            font-style: italic;
+        }
+        svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+        }
+        line {
+            stroke: black;
+            stroke-width: 1;
+        }
+        line.dotted {
+            stroke-dasharray: 4; /* 점선 패턴 */
+        }
+    </style>
+</head>
+<body>
+    <!-- Time Display -->
+    <div class="time" id="time"></div>
+
+    <svg></svg>
+    <div class="axes">
+        <!-- X-Axis -->
+        <div class="line x-axis"></div>
+        <!-- Y-Axis -->
+        <div class="line y-axis"></div>
+    </div>
+    <script>
+        const positions = []; // 저장된 점들의 위치와 요소 참조
+
+        function createRandomCircleWithText(text, link) {
+            // 화면 크기 가져오기
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // 안전 거리 계산 (8%의 여유 공간 확보)
+            const safeMarginX = viewportWidth * 0.10;
+            const safeMarginY = viewportHeight * 0.08;
+
+            // 임의의 위치 계산 (안전 영역 내에서 생성)
+            const randomX = Math.random() * (viewportWidth - 2 * safeMarginX) + safeMarginX;
+            const randomY = Math.random() * (viewportHeight - 2 * safeMarginY) + safeMarginY;
+            
+            // 컨테이너 생성
+            const container = document.createElement('div');
+            container.classList.add('circle-container');
+            container.style.left = `${randomX}px`;
+            container.style.top = `${randomY}px`;
+
+            // 원 생성
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+
+            // 텍스트(링크) 생성
+            const circleText = document.createElement('a');
+            circleText.classList.add('circle-text');
+            circleText.textContent = `${text} (${Math.round(randomX)}, ${Math.round(randomY)})`;
+            circleText.href = link;
+            circleText.target = "_blank"; // 새 탭에서 열기
+
+            // 컨테이너에 원과 텍스트 추가
+            container.appendChild(circle);
+            container.appendChild(circleText);
+
+            // 컨테이너를 body에 추가
+            document.body.appendChild(container);
+
+            // 위치 저장
+            positions.push({ x: randomX, y: randomY, element: container });
+        }
+
+        function createCirclesWithCustomLinks(items) {
+            items.forEach(item => createRandomCircleWithText(item.text, item.link));
+        }
+
+        function drawLines() {
+            const svg = document.querySelector('svg');
+            positions.forEach((pos, index) => {
+                // 연결할 다른 두 점 선택
+                const connections = [];
+                while (connections.length < 2) {
+                    const randomIndex = Math.floor(Math.random() * positions.length);
+                    if (randomIndex !== index && !connections.includes(randomIndex)) {
+                        connections.push(randomIndex);
+                    }
+                }
+
+                // 선 그리기
+                connections.forEach(targetIndex => {
+                    const target = positions[targetIndex];
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", pos.x + 10); // 원 중심으로 조정
+                    line.setAttribute("y1", pos.y + 10);
+                    line.setAttribute("x2", target.x + 10);
+                    line.setAttribute("y2", target.y + 10);
+
+                    // 임의로 점선 또는 실선 지정
+                    if (Math.random() < 0.5) {
+                        line.classList.add('dotted');
+                    }
+
+                    svg.appendChild(line);
+                });
+            });
+        }
+
+        // 사용자 지정 텍스트와 링크
+        const customItems = [
+            { text: 'Me', link: 'https://en.wikipedia.org/wiki/South_Korea' },
+            { text: 'My', link: 'https://www.instagram.com/24rim2/' },
+            { text: 'Self', link: 'https://open.spotify.com/playlist/2ts5sujr2otF6uBsiwy1qk' },
+            { text: 'and', link: 'https://stackoverflow.com' },
+            { text: 'I', link: 'https://developer.mozilla.org' }
+        ];
+
+        function updateTime() {
+            const timeElement = document.getElementById('time');
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            timeElement.textContent = `GMT+9 ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 페이지 로드 시 실행
+        window.onload = () => {
+            createCirclesWithCustomLinks(customItems);
+            drawLines();
+            updateTime(); // Initialize time
+            setInterval(updateTime, 1000); // Update time every second
+        };
+    </script>
+</body>
+</html>
